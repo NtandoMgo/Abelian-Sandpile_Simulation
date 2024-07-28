@@ -2,49 +2,41 @@ package serialAbelianSandpile;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
+import serialAbelianSandpile.Grid;
+
 public class ParallelAutoSim extends RecursiveAction {
-    static final boolean DEBUG = false;// for debugging output, off
+    static final boolean DEBUG = false; // for debugging output, off
 
-    private int threshold;
+    private int threshold = 10;
     private int lo, hi;
-
-    private static int counter;
-
-    private static long time;
-
-    private static int height;
-    private static int width;
     private int[][] array;
     static Grid simulationGrid;
+    static int height;
+    static int width;
+    private static long time;
+    static int counter = 0;
 
     public ParallelAutoSim(int l, int h, int[][] array) {
-        this.hi = h;
         this.lo = l;
+        this.hi = h;
         this.array = array;
-        this.threshold = (hi - lo) * width / 10; // Dynamic threshold based on the array size
     }
 
     public static void main(String[] args) {
-        // int[][] arr = ParallelAutoSim.readArrayFromCSV("input/8_by_8_all_4
-        // copy.csv");
-        // height = arr.length;
-        // width = arr[0].length;
-
-        String inputfilename = "input/1001_by_1001_all_8.csv";
+        String inputfilename = "input/8_by_8_all_4 copy.csv";
         simulationGrid = new Grid(readArrayFromCSV(inputfilename));
-
+        
         int lo = 0;
         int hi = height; // Set the range for the task
         ParallelAutoSim task = new ParallelAutoSim(lo, hi, simulationGrid.getGrid());
         task.fork(); // Fork the task to execute in parallel
         task.join(); // Wait for the task to complete
 
-        // ForkJoinPool p = new ForkJoinPool(); 
-        // p.invoke(task);
-
+        if (DEBUG) {
+            simulationGrid.printGrid();
+        }
 
         // System.out.println("Parallel computation completed.");
         System.out.println("Simulation complete, writing image...");
@@ -75,26 +67,20 @@ public class ParallelAutoSim extends RecursiveAction {
     @Override
     protected void compute() {
         long startTime = System.currentTimeMillis();
-
         if ((hi - lo) * width < threshold) {
             if (DEBUG) {
                 System.out.printf("starting config: %d \n", counter);
                 simulationGrid.printGrid();
             }
-            while (simulationGrid.update()) {// run until no change
+            while (simulationGrid.update()) { // run until no change
                 if (DEBUG)
                     simulationGrid.printGrid();
                 counter++;
             }
-        } else {// if the work if large enough or still large, break it down
-            int spliting = (hi - lo) / 2 + lo;
-            if (spliting == lo) {
-                spliting = lo + 1; // Prevent infinite recursion
-            }
-            // invokeAll(ParallelAutoSim(lo, hi, array), ParallelAutoSim(spliting, hi,
-            // array));
-            ParallelAutoSim left = new ParallelAutoSim(lo, spliting, array);
-            ParallelAutoSim right = new ParallelAutoSim(spliting, hi, array);
+        } else { // if the work is large enough or still large, break it down
+            int splitting = (hi - lo) / 2 + lo;
+            ParallelAutoSim left = new ParallelAutoSim(lo, splitting, array);
+            ParallelAutoSim right = new ParallelAutoSim(splitting, hi, array);
             left.fork();
             right.compute();
             left.join();
@@ -104,16 +90,15 @@ public class ParallelAutoSim extends RecursiveAction {
         time = endTime - startTime;
     }
 
-    // input is via a CSV file
     public static int[][] readArrayFromCSV(String filePath) {
         int[][] array = null;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line = br.readLine();
             if (line != null) {
                 String[] dimensions = line.split(",");
-                int width = Integer.parseInt(dimensions[0]);
-                int height = Integer.parseInt(dimensions[1]);
-                System.out.printf("Rows: %d, Columns: %d\n", width, height); // Do NOT CHANGE - you must ouput this
+                width = Integer.parseInt(dimensions[0]);
+                height = Integer.parseInt(dimensions[1]);
+                System.out.printf("Rows: %d, Columns: %d\n", height, width);
 
                 array = new int[height][width];
                 int rowIndex = 0;
@@ -126,8 +111,6 @@ public class ParallelAutoSim extends RecursiveAction {
                     rowIndex++;
                 }
             }
-            height = array.length;
-            width = array[0].length;
         } catch (IOException e) {
             e.printStackTrace();
         }
