@@ -9,7 +9,7 @@ import serialAbelianSandpile.Grid;
 public class ParallelAutoSim extends RecursiveAction {
     static final boolean DEBUG = false; // for debugging output, off
 
-    private int threshold = 10;
+    private int threshold = 100;
     private int lo, hi;
     private int[][] array;
     static Grid simulationGrid;
@@ -25,7 +25,14 @@ public class ParallelAutoSim extends RecursiveAction {
     }
 
     public static void main(String[] args) {
-        String inputfilename = "input/8_by_8_all_4 copy.csv";
+
+        if (args.length!=2) {   //input is the name of the input and output files
+    		System.out.println("Incorrect number of command line arguments provided.");   	
+    		System.exit(0);
+    	}
+
+        String inputfilename = args[0];
+        String outputfilename = args[1];
         simulationGrid = new Grid(readArrayFromCSV(inputfilename));
         
         int lo = 0;
