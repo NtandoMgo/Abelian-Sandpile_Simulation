@@ -2,14 +2,13 @@ package serialAbelianSandpile;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
-
-import serialAbelianSandpile.Grid;
 
 public class ParallelAutoSim extends RecursiveAction {
     static final boolean DEBUG = false; // for debugging output, off
 
-    private int threshold = 100;
+    private int threshold = 500;
     private int lo, hi;
     private int[][] array;
     static Grid simulationGrid;
@@ -26,6 +25,8 @@ public class ParallelAutoSim extends RecursiveAction {
 
     public static void main(String[] args) {
 
+        
+
         if (args.length!=2) {   //input is the name of the input and output files
     		System.out.println("Incorrect number of command line arguments provided.");   	
     		System.exit(0);
@@ -38,29 +39,22 @@ public class ParallelAutoSim extends RecursiveAction {
         int lo = 0;
         int hi = height; // Set the range for the task
         ParallelAutoSim task = new ParallelAutoSim(lo, hi, simulationGrid.getGrid());
-        task.fork(); // Fork the task to execute in parallel
-        task.join(); // Wait for the task to complete
+        ForkJoinPool p = new ForkJoinPool();
+        p.invoke(task);
 
+        /*
         if (DEBUG) {
             simulationGrid.printGrid();
         }
+        */
+            
 
         // System.out.println("Parallel computation completed.");
         System.out.println("Simulation complete, writing image...");
         try {
-            if (inputfilename.equals("input/8_by_8_all_4 copy.csv")) {
-                simulationGrid.gridToImage("output/outputFileparallel-8_by_8.png");
-            } else if (inputfilename.equals("input/16_by_16_all_4.csv")) {
-                simulationGrid.gridToImage("output/outputFileparallel-16_by_16_all_4.png");
-            } else if (inputfilename.equals("input/16_by_16_one_100.csv")) {
-                simulationGrid.gridToImage("output/outputFileparallel-16_by_16_one_100.png");
-            } else if (inputfilename.equals("input/65_by_65_all_4.csv")) {
-                simulationGrid.gridToImage("output/outputFileparallel-65_by_65_all_4.png");
-            } else if (inputfilename.equals("input/517_by_517_centre_534578.csv")) {
-                simulationGrid.gridToImage("output/outputFileparallel-517_by_517_centre_534578.png");
-            } else if (inputfilename.equals("input/1001_by_1001_all_8.csv")) {
-                simulationGrid.gridToImage("output/outputFileparallel-1001_by_1001_all_8.png");
-            }
+
+            simulationGrid.gridToImage(outputfilename);
+           
 
         } catch (IOException e) {
             // TODO Auto-generated catch block

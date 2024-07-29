@@ -84,7 +84,7 @@ class AutomatonSimulation{
 		while(simulationGrid.update()) {//run until no change
 	    		if(DEBUG) simulationGrid.printGrid();
 	    		counter++;
-	    	}
+	    }
    		tock(); //end timer
    		
         System.out.println("Simulation complete, writing image...");
