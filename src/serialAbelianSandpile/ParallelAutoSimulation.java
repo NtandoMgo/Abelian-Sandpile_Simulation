@@ -3,13 +3,14 @@ package serialAbelianSandpile;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
 public class ParallelAutoSimulation extends RecursiveAction {
 
-    static final boolean DEBUG = true; // for debiging output
+    static final boolean DEBUG = false; // for debiging output
 
-    private int threshold = 500;
+    private int threshold = 600;
 
     static long startTime = 0;
     static long endtime = 0;
@@ -64,60 +65,63 @@ public class ParallelAutoSimulation extends RecursiveAction {
     public static void main(String[] args) {
         Grid simGrid; // the cellular automaton grid
 
-        String iFileName = "input/16_by_16_all_4.csv"; // input file name
-        String oFileName = "outputtest/16by16.png"; // output file name
+        String iFileName = "input/517_by_517_centre_534578.csv"; // input file name
+        String oFileName = "outputtest/517by517-parallel.png"; // output file name
 
         // Read from input .csv file
         simGrid = new Grid(readArrayFromCSV(iFileName));
 
         ParallelAutoSimulation task = new ParallelAutoSimulation(simGrid, 0, simGrid.getColumns());
+        ForkJoinPool p = new ForkJoinPool();
+        p.invoke(task);
 
-        int counter=0;
-    	tick(); //start timer
-    	if(DEBUG) {
-    		System.out.printf("starting config: %d \n",counter);
-    		grid.printGrid();
-    	}
-		while(grid.update()) {//run until no change
-	    		if(DEBUG) grid.printGrid();
-	    		counter++;
-	    }
-   		tock();
+        int counter = 0;
+        tick(); // start timer
+        if (DEBUG) {
+            System.out.printf("starting config: %d \n", counter);
+            grid.printGrid();
+        }
+        while (grid.update()) {// run until no change
+            if (DEBUG)
+                grid.printGrid();
+            counter++;
+        }
+        tock();
 
-           System.out.println("Simulation complete, writing image...");
-           try {
+        System.out.println("Simulation complete, writing image...");
+        try {
             grid.gridToImage(oFileName);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             System.out.println("Couldn't write image");
-        } //write grid as an image
-           System.out.printf("Number of steps to stable state: %d \n",counter);
-           System.out.printf("Time: %d ms\n",endtime - startTime );	
+        } // write grid as an image
+        System.out.printf("Number of steps to stable state: %d \n", counter);
+        System.out.printf("Time: %d ms\n", endtime - startTime);
     }
 
-    public static boolean update(){
+    public static boolean update() {
         boolean change = false;
-            // do not update border
-            for (int i = 1; i < grid.getRows() - 1; i++) {
-                for (int j = 1; j < grid.getColumns() - 1; j++) {
-                    // updateGrid[i][j]
-                    int val = (grid.getGrid()[i][j] % 4) +
-                            (grid.getGrid()[i - 1][j] / 4) +
-                            grid.getGrid()[i + 1][j] / 4 +
-                            grid.getGrid()[i][j - 1] / 4 +
-                            grid.getGrid()[i][j + 1] / 4;
-                    grid.setUpdateGrid(i, j, val);
+        // do not update border
+        for (int i = 1; i < grid.getRows() - 1; i++) {
+            for (int j = 1; j < grid.getColumns() - 1; j++) {
+                // updateGrid[i][j]
+                int val = (grid.getGrid()[i][j] % 4) +
+                        (grid.getGrid()[i - 1][j] / 4) +
+                        grid.getGrid()[i + 1][j] / 4 +
+                        grid.getGrid()[i][j - 1] / 4 +
+                        grid.getGrid()[i][j + 1] / 4;
+                grid.setUpdateGrid(i, j, val);
 
-                    if (grid.getGrid()[i][j] != grid.getUpdateGrid(i, j)) {
-                        change = true;
-                    }
+                if (grid.getGrid()[i][j] != grid.getUpdateGrid(i, j)) {
+                    change = true;
                 }
-            } // end nested for
-            if (change) {
-                grid.nextTimeStep();
             }
-            return change;
+        } // end nested for
+        if (change) {
+            grid.nextTimeStep();
+        }
+        return change;
     }
 
     @Override
@@ -127,6 +131,16 @@ public class ParallelAutoSimulation extends RecursiveAction {
 
         if ((hi - lo) * width < threshold) {
             update();
+        } else {
+            int split = (hi - lo) / 2 + lo;
+            ParallelAutoSimulation lTask = new ParallelAutoSimulation(grid, lo, split);
+            ParallelAutoSimulation rTask = new ParallelAutoSimulation(grid, split, hi);
+            //System.out.println("before fork");
+            lTask.fork();
+            //System.out.println("After fork-before compute");
+            rTask.compute();
+            //System.out.println("After compute");
+            lTask.join();
         }
     }
 }

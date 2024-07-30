@@ -2,12 +2,8 @@
 package serialAbelianSandpile;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
 
 import javax.imageio.ImageIO;
 
@@ -116,7 +112,7 @@ public class Grid {
 		}
 		return change;
 	}
-	
+
 	// display the grid in text format
 	public void printGrid() {
 		int i, j;

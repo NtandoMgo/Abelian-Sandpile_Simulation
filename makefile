@@ -20,9 +20,9 @@ MAIN_CLASS = serialAbelianSandpile.AutomatonSimulation
 # Default arguments (update these if needed)
 #ARGS ?= input/65_by_65_all_4.csv output/outputFileParallel-65_by_65_all_4.png  # Replace 'default_arguments' with your specific default arguments, if any
 #ARGS ?= input/8_by_8_all_4copy.csv outputtest/outputFileS-8_by_8.png
-ARGS ?= input/16_by_16_all_4.csv output/outputS-16_by_16_all_4.png
+#ARGS ?= input/16_by_16_all_4.csv output/outputS-16_by_16_all_4.png
 #ARGS ?= input/16_by_16_one_100.csv output/outputFileparallel-16_by_16_one_100.png
-#ARGS ?= input/517_by_517_centre_534578.csv output/outputFileserial-517_by_517_centre_534578.png
+ARGS ?= input/517_by_517_centre_534578.csv output/outputFileserial-517_by_517_centre_534578.png
 #ARGS ?= input/1001_by_1001_all_8.csv output/outputFileparallel-1001_by_1001_all_8.png
 
 # Targets
