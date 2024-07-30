@@ -2,7 +2,9 @@
 package serialAbelianSandpile;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -52,6 +54,11 @@ public class Grid {
 
 	public int[][] getGrid() {
 		return grid;
+	}
+
+	// 
+	public int getUpdateGrid(int i, int j){
+		return updateGrid[i][j];
 	}
 
 	public int getRows() {
@@ -109,20 +116,7 @@ public class Grid {
 		}
 		return change;
 	}
-
-	// MY key method to calculate the next update grid in parallel
-	public boolean updateParallel() {
-		ForkJoinPool pool = new ForkJoinPool();
-
-		//GridUpdateTask task = new GridUpdateTask(1, rows - 1, this);  //-Will create class retuens a boolean
-		//boolean change = pool.invoke(task);
-
-		if (true) {
-			nextTimeStep();
-		}
-		return false;
-	}
-
+	
 	// display the grid in text format
 	public void printGrid() {
 		int i, j;
@@ -147,7 +141,7 @@ public class Grid {
 			System.out.printf("  --");
 		System.out.printf("+\n\n");
 	}
-
+	
 	// write grid out as an image
 	public void gridToImage(String fileName) throws IOException {
 		BufferedImage dstImage = new BufferedImage(rows, columns, BufferedImage.TYPE_INT_ARGB);
@@ -193,8 +187,5 @@ public class Grid {
 
 		File dstFile = new File(fileName);
 		ImageIO.write(dstImage, "png", dstFile);
-	}
-
-	
-
+	}    
 }
