@@ -10,7 +10,7 @@ public class ParallelAutoSimulation extends RecursiveAction {
 
     static final boolean DEBUG = false; // for debiging output
 
-    private int threshold = 600;
+    private static int threshold = 80;
 
     static long startTime = 0;
     static long endtime = 0;
@@ -65,8 +65,16 @@ public class ParallelAutoSimulation extends RecursiveAction {
     public static void main(String[] args) {
         Grid simGrid; // the cellular automaton grid
 
-        String iFileName = "input/517_by_517_centre_534578.csv"; // input file name
-        String oFileName = "outputtest/517by517-parallel.png"; // output file name
+        //String iFileName = "input/65_by_65_all_4.csv"; // input file name
+        //String oFileName = "outputtest/65-parallel.png"; // output file name
+
+        if (args.length!=2) {   //input is the name of the input and output files
+    		System.out.println("Incorrect number of command line arguments provided.");   	
+    		System.exit(0);
+    	}
+
+        String iFileName = args[0];
+        String oFileName = args[1];
 
         // Read from input .csv file
         simGrid = new Grid(readArrayFromCSV(iFileName));
@@ -88,15 +96,18 @@ public class ParallelAutoSimulation extends RecursiveAction {
         }
         tock();
 
+        int noThreads = Runtime.getRuntime().availableProcessors();
+
         System.out.println("Simulation complete, writing image...");
         try {
             grid.gridToImage(oFileName);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             System.out.println("Couldn't write image");
-        } // write grid as an image
+        } 
+        
+        // write grid as an image
         System.out.printf("Number of steps to stable state: %d \n", counter);
+        System.out.printf("Number of threads: %d \n", noThreads);
         System.out.printf("Time: %d ms\n", endtime - startTime);
     }
 

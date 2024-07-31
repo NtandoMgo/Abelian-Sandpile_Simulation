@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "AutomatonSimulation",
+            "request": "launch",
+            "mainClass": "serialAbelianSandpile.AutomatonSimulation",
+            "projectName": "PCP_ParallelAssignment2024"
+        },
+        {
+            "type": "java",
+            "name": "ParallelAutoSim",
+            "request": "launch",
+            "mainClass": "serialAbelianSandpile.ParallelAutoSim",
+            "projectName": "PCP_ParallelAssignment2024"
+        },
+        {
+            "type": "java",
+            "name": "ParallelAutoSimulation",
+            "request": "launch",
+            "mainClass": "serialAbelianSandpile.ParallelAutoSimulation",
+            "projectName": "PCP_ParallelAssignment2024"
+        }
+    ]
+}
